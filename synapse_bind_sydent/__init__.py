@@ -40,6 +40,10 @@ class SydentBinder:
             f"{protocol}://{config.sydent_host}/_matrix/identity/internal/bind"
         )
 
+        self._api.register_account_validity_callbacks(
+            on_user_registration=self.on_register,
+        )
+
     @staticmethod
     def parse_config(config: Dict[str, Any]) -> SydentBinderConfig:
         if "sydent_host" not in config or not isinstance(config["sydent_host"], str):

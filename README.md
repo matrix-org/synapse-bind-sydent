@@ -17,7 +17,13 @@ Then alter your homeserver configuration, adding to your `modules` configuration
 modules:
   - module: synapse_bind_sydent.SydentBinder
     config:
-      # TODO: Complete this section with an example for your module
+      # The hostname (or IP address) of the Sydent instance to bind to. Must be reachable
+      # by Synapse.
+      # Required.
+      sydent_host: example.com
+      # Whether to use HTTPS when sending a request to Sydent.
+      # Optional, defaults to false.
+      use_https: false
 ```
 
 
@@ -73,14 +79,4 @@ Synapse developers (assuming a Unix-like shell):
  6. Push the tag.
     ```shell
     git push origin tag v$version
-    ```
-
- 7. If applicable:
-    Create a *release*, based on the tag you just pushed, on GitHub or GitLab.
-
- 8. If applicable:
-    Create a source distribution and upload it to PyPI:
-    ```shell
-    python -m build
-    twine upload dist/synapse_bind_sydent-$version*
     ```
