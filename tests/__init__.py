@@ -1,7 +1,7 @@
 from asyncio import Future
 from typing import Any, Awaitable, Dict, List, TypeVar
 
-from mock import Mock
+from unittest.mock import Mock
 from synapse.module_api import ModuleApi
 
 from synapse_bind_sydent import SydentBinder

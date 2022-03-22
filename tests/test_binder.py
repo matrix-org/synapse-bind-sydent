@@ -39,7 +39,6 @@ class SydentBinderTestCase(aiounittest.AsyncTestCase):
         store_remote_3pid_association: Mock = module._api.store_remote_3pid_association  # type: ignore[assignment]
         self.assertEqual(store_remote_3pid_association.call_count, 0)
 
-
     async def test_single_assoc(self) -> None:
         """Tests that the right function calls are made when the newly registered user has
         a single 3PID associated.
@@ -113,6 +112,7 @@ class SydentBinderTestCase(aiounittest.AsyncTestCase):
     async def test_network_error(self) -> None:
         """Tests that the process is aborted right away if an error was raised when trying
         to bind a 3PID."""
+
         async def post_json_get_json(*args: Any, **kwargs: Any) -> None:
             raise RuntimeError("oh no")
 
