@@ -17,13 +17,10 @@ Then alter your homeserver configuration, adding to your `modules` configuration
 modules:
   - module: synapse_bind_sydent.SydentBinder
     config:
-      # The hostname (or IP address) of the Sydent instance to bind to. Must be reachable
-      # by Synapse.
+      # The base URL (protocol + hostname or address) of the Sydent instance to bind to.
+      # Must be reachable by Synapse.
       # Required.
-      sydent_host: example.com
-      # Whether to use HTTPS when sending a request to Sydent.
-      # Optional, defaults to false.
-      use_https: false
+      sydent_base_url: https://example.com
 ```
 
 

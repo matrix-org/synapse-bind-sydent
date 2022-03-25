@@ -13,6 +13,7 @@
 # limitations under the License.
 import logging
 from typing import Any, Dict
+from urllib.parse import urlparse
 
 import attr
 from synapse.module_api import ModuleApi
@@ -23,8 +24,7 @@ logger = logging.getLogger(__name__)
 
 @attr.s(auto_attribs=True, frozen=True)
 class SydentBinderConfig:
-    sydent_host: str
-    use_https: bool = False
+    sydent_base_url: str
 
 
 class SydentBinder:
@@ -35,10 +35,12 @@ class SydentBinder:
 
         self._http_client = api.http_client
 
-        protocol = "https" if config.use_https else "http"
         self._sydent_bind_url = (
-            f"{protocol}://{config.sydent_host}/_matrix/identity/internal/bind"
+            f"{config.sydent_base_url}/_matrix/identity/internal/bind"
         )
+
+        scheme = urlparse(config.sydent_base_url).scheme
+        self._sydent_host = config.sydent_base_url.replace(f"{scheme}://", "")
 
         self._api.register_third_party_rules_callbacks(
             on_threepid_bind=self.on_threepid_bind,
@@ -46,8 +48,19 @@ class SydentBinder:
 
     @staticmethod
     def parse_config(config: Dict[str, Any]) -> SydentBinderConfig:
-        if "sydent_host" not in config or not isinstance(config["sydent_host"], str):
-            raise ConfigError("sydent_host needs to be a string")
+        if (
+            "sydent_base_url" not in config
+            or not isinstance(config["sydent_base_url"], str)
+        ):
+            raise ConfigError("sydent_base_url needs to be a string")
+
+        if (
+            not config["sydent_base_url"].startswith("http://")
+            and not config["sydent_base_url"].startswith("https://")
+        ):
+            raise ConfigError(
+                "sydent_base_url needs to include an HTTP(S) protocol scheme"
+            )
 
         return SydentBinderConfig(**config)
 
@@ -79,5 +92,5 @@ class SydentBinder:
             user_id,
             medium,
             address,
-            self._config.sydent_host,
+            self._sydent_host,
         )

@@ -19,7 +19,7 @@ def make_awaitable(result: TV) -> Awaitable[TV]:
     return future
 
 
-def create_module(http_mock: Mock) -> SydentBinder:
+def create_module(http_mock: Mock, config_override={}) -> SydentBinder:
     # Create a mock based on the ModuleApi spec, but override some mocked functions
     # because some capabilities are needed for running the tests.
     module_api = Mock(spec=ModuleApi)
@@ -27,6 +27,7 @@ def create_module(http_mock: Mock) -> SydentBinder:
     module_api.http_client = http_mock
 
     # If necessary, give parse_config some configuration to parse.
-    config = SydentBinder.parse_config({"sydent_host": "test"})
+    config_override.setdefault("sydent_base_url", "https://test")
+    config = SydentBinder.parse_config(config_override)
 
     return SydentBinder(config, module_api)

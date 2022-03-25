@@ -15,6 +15,7 @@ from typing import Any
 from unittest.mock import Mock
 
 import aiounittest
+from synapse.module_api.errors import ConfigError
 
 from tests import create_module, make_awaitable
 
@@ -64,3 +65,13 @@ class SydentBinderTestCase(aiounittest.AsyncTestCase):
 
         store_remote_3pid_association: Mock = module._api.store_remote_3pid_association  # type: ignore[assignment]
         self.assertEqual(store_remote_3pid_association.call_count, 0)
+
+    async def test_base_url_missing_scheme(self):
+        """Tests that trying to initialise the module with a base URL that doesn't include
+        a URL scheme raises an exception.
+        """
+        with self.assertRaises(ConfigError):
+            create_module(
+                http_mock=Mock(),
+                config_override={"sydent_base_url": "test"},
+            )
