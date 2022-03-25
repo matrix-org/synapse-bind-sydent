@@ -19,15 +19,10 @@ def make_awaitable(result: TV) -> Awaitable[TV]:
     return future
 
 
-def create_module(
-    user_threepids: List[Dict[str, Any]], http_mock: Mock
-) -> SydentBinder:
+def create_module(http_mock: Mock) -> SydentBinder:
     # Create a mock based on the ModuleApi spec, but override some mocked functions
     # because some capabilities are needed for running the tests.
     module_api = Mock(spec=ModuleApi)
-    module_api.get_threepids_for_user = Mock(
-        return_value=make_awaitable(user_threepids)
-    )
     module_api.store_remote_3pid_association = Mock(return_value=make_awaitable(None))
     module_api.http_client = http_mock
 

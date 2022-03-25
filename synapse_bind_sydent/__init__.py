@@ -40,8 +40,8 @@ class SydentBinder:
             f"{protocol}://{config.sydent_host}/_matrix/identity/internal/bind"
         )
 
-        self._api.register_account_validity_callbacks(
-            on_user_registration=self.on_register,
+        self._api.register_third_party_rules_callbacks(
+            on_threepid_bind=self.on_threepid_bind,
         )
 
     @staticmethod
@@ -51,35 +51,33 @@ class SydentBinder:
 
         return SydentBinderConfig(**config)
 
-    async def on_register(self, user_id: str) -> None:
-        """Binds the 3PID on registration."""
+    async def on_threepid_bind(self, user_id: str, medium: str, address: str) -> None:
+        """Binds the 3PID to Sydent once it's been associated locally."""
         # Get the list of 3PIDs for this user.
-        threepids = await self._api.get_threepids_for_user(user_id)
+        body = {
+            "medium": medium,
+            "address": address,
+            "mxid": user_id,
+        }
 
-        for threepid in threepids:
-            body = {
-                "address": threepid["address"],
-                "medium": threepid["medium"],
-                "mxid": user_id,
-            }
-
-            # Bind the threepid
-            try:
-                await self._http_client.post_json_get_json(self._sydent_bind_url, body)
-            except Exception as e:
-                # If there was an error, the IS is likely unreachable, so don't try again.
-                logger.exception(
-                    "Failed to bind 3PID %s to identity server at %s: %s",
-                    threepid,
-                    self._sydent_bind_url,
-                    e,
-                )
-                return
-
-            # Store the association, so we can use this to unbind later.
-            await self._api.store_remote_3pid_association(
-                user_id,
-                threepid["medium"],
-                threepid["address"],
-                self._config.sydent_host,
+        # Bind the threepid
+        try:
+            await self._http_client.post_json_get_json(self._sydent_bind_url, body)
+        except Exception as e:
+            # If there was an error, the IS is likely unreachable, so don't try again.
+            logger.exception(
+                "Failed to bind %s 3PID %s to identity server at %s: %s",
+                medium,
+                address,
+                self._sydent_bind_url,
+                e,
             )
+            return
+
+        # Store the association, so we can use this to unbind later.
+        await self._api.store_remote_3pid_association(
+            user_id,
+            medium,
+            address,
+            self._config.sydent_host,
+        )
