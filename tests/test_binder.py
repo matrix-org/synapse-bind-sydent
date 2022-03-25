@@ -66,7 +66,7 @@ class SydentBinderTestCase(aiounittest.AsyncTestCase):
         store_remote_3pid_association: Mock = module._api.store_remote_3pid_association  # type: ignore[assignment]
         self.assertEqual(store_remote_3pid_association.call_count, 0)
 
-    async def test_base_url_missing_scheme(self):
+    async def test_base_url_missing_scheme(self) -> None:
         """Tests that trying to initialise the module with a base URL that doesn't include
         a URL scheme raises an exception.
         """

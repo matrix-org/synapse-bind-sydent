@@ -48,16 +48,14 @@ class SydentBinder:
 
     @staticmethod
     def parse_config(config: Dict[str, Any]) -> SydentBinderConfig:
-        if (
-            "sydent_base_url" not in config
-            or not isinstance(config["sydent_base_url"], str)
+        if "sydent_base_url" not in config or not isinstance(
+            config["sydent_base_url"], str
         ):
             raise ConfigError("sydent_base_url needs to be a string")
 
-        if (
-            not config["sydent_base_url"].startswith("http://")
-            and not config["sydent_base_url"].startswith("https://")
-        ):
+        if not config["sydent_base_url"].startswith("http://") and not config[
+            "sydent_base_url"
+        ].startswith("https://"):
             raise ConfigError(
                 "sydent_base_url needs to include an HTTP(S) protocol scheme"
             )

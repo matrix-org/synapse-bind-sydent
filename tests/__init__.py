@@ -1,5 +1,5 @@
 from asyncio import Future
-from typing import Awaitable, TypeVar
+from typing import Awaitable, Dict, Optional, TypeVar
 from unittest.mock import Mock
 
 from synapse.module_api import ModuleApi
@@ -19,7 +19,9 @@ def make_awaitable(result: TV) -> Awaitable[TV]:
     return future
 
 
-def create_module(http_mock: Mock, config_override={}) -> SydentBinder:
+def create_module(
+    http_mock: Mock, config_override: Optional[Dict[str, str]] = None
+) -> SydentBinder:
     # Create a mock based on the ModuleApi spec, but override some mocked functions
     # because some capabilities are needed for running the tests.
     module_api = Mock(spec=ModuleApi)
@@ -27,6 +29,9 @@ def create_module(http_mock: Mock, config_override={}) -> SydentBinder:
     module_api.http_client = http_mock
 
     # If necessary, give parse_config some configuration to parse.
+    if config_override is None:
+        config_override = {}
+
     config_override.setdefault("sydent_base_url", "https://test")
     config = SydentBinder.parse_config(config_override)
 
