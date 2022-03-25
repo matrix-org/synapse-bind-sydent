@@ -1,6 +1,7 @@
 # Bind 3PIDs to Sydent
 
-A module that leverages Sydent's internal bind APIs to automatically record 3PIDs association on an IS upon registration.
+A module that leverages Sydent's internal bind APIs to automatically record 3PIDs
+association on a Sydent instance once it's been verified on the local Synapse homeserver.
 
 
 ## Installation
