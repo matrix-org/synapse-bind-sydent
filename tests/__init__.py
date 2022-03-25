@@ -1,5 +1,5 @@
 from asyncio import Future
-from typing import Any, Awaitable, Dict, List, TypeVar
+from typing import Awaitable, TypeVar
 from unittest.mock import Mock
 
 from synapse.module_api import ModuleApi
