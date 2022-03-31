@@ -39,8 +39,7 @@ class SydentBinder:
             f"{config.sydent_base_url}/_matrix/identity/internal/bind"
         )
 
-        scheme = urlparse(config.sydent_base_url).scheme
-        self._sydent_host = config.sydent_base_url.replace(f"{scheme}://", "")
+        self._sydent_host = urlparse(config.sydent_base_url).netloc
 
         self._api.register_third_party_rules_callbacks(
             on_threepid_bind=self.on_threepid_bind,
@@ -53,9 +52,7 @@ class SydentBinder:
         ):
             raise ConfigError("sydent_base_url needs to be a string")
 
-        if not config["sydent_base_url"].startswith("http://") and not config[
-            "sydent_base_url"
-        ].startswith("https://"):
+        if urlparse(config["sydent_base_url"]).scheme not in ("http", "https"):
             raise ConfigError(
                 "sydent_base_url needs to include an HTTP(S) protocol scheme"
             )
