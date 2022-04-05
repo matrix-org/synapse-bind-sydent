@@ -1,6 +1,7 @@
 # Bind 3PIDs to Sydent
 
-A module that leverages Sydent's internal bind APIs to automatically record 3PIDs association on an IS upon registration.
+A module that leverages Sydent's internal bind APIs to automatically record 3PIDs
+association on a Sydent instance once it's been verified on the local Synapse homeserver.
 
 
 ## Installation
@@ -17,7 +18,10 @@ Then alter your homeserver configuration, adding to your `modules` configuration
 modules:
   - module: synapse_bind_sydent.SydentBinder
     config:
-      # TODO: Complete this section with an example for your module
+      # The base URL (protocol + hostname or address) of the Sydent instance to bind to.
+      # Must be reachable by Synapse.
+      # Required.
+      sydent_base_url: https://example.com
 ```
 
 
@@ -73,14 +77,4 @@ Synapse developers (assuming a Unix-like shell):
  6. Push the tag.
     ```shell
     git push origin tag v$version
-    ```
-
- 7. If applicable:
-    Create a *release*, based on the tag you just pushed, on GitHub or GitLab.
-
- 8. If applicable:
-    Create a source distribution and upload it to PyPI:
-    ```shell
-    python -m build
-    twine upload dist/synapse_bind_sydent-$version*
     ```
