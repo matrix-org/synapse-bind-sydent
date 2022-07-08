@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 from urllib.parse import urlparse
 
 import attr
@@ -39,10 +39,15 @@ class SydentBinder:
             f"{config.sydent_base_url}/_matrix/identity/internal/bind"
         )
 
+        self._sydent_unbind_url = (
+            f"{config.sydent_base_url}/_matrix/identity/internal/unbind"
+        )
+
         self._sydent_host = urlparse(config.sydent_base_url).netloc
 
         self._api.register_third_party_rules_callbacks(
             on_threepid_bind=self.on_threepid_bind,
+            on_threepid_unbind=self.on_threepid_unbind,
         )
 
     @staticmethod
@@ -89,3 +94,32 @@ class SydentBinder:
             address,
             self._sydent_host,
         )
+
+    async def on_threepid_unbind(
+        self, user_id: str, medium: str, address: str, identity_server: str
+    ) -> Tuple[bool, bool]:
+        """Unbinds the 3PID to Sydent before removing it locally."""
+        body = {
+            "medium": medium,
+            "address": address,
+            "mxid": user_id,
+        }
+
+        # Unbind the threepid
+        try:
+            await self._http_client.post_json_get_json(self._sydent_unbind_url, body)
+        except Exception as e:
+            # If there was an error, the IS is likely unreachable, so don't try again.
+            logger.exception(
+                "Failed to unbind %s 3PID %s to identity server at %s: %s",
+                medium,
+                address,
+                self._sydent_unbind_url,
+                e,
+            )
+            raise e
+
+        # We don't want to do another unbind with the IS registered in the
+        # 3pid assocation table, so return stop = True
+        # TODO handle changed ?
+        return (True, True)
