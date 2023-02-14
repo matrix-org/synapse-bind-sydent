@@ -3,6 +3,7 @@
 A module that leverages Sydent's internal bind APIs to automatically record 3PIDs
 association on a Sydent instance once it's been verified on the local Synapse homeserver.
 
+This module works with Synapse v1.78.0 and above.
 
 ## Installation
 
@@ -29,7 +30,7 @@ modules:
 
 In a virtual environment with pip ≥ 21.1, run
 ```shell
-pip install -e .[dev]
+pip install -e ".[dev]"
 ```
 
 To run the unit tests, you can either use:
