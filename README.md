@@ -29,7 +29,7 @@ modules:
 
 In a virtual environment with pip ≥ 21.1, run
 ```shell
-pip install -e .[dev]
+pip install -e ".[dev]"
 ```
 
 To run the unit tests, you can either use:
