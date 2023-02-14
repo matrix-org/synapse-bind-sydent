@@ -42,7 +42,7 @@ class SydentBinder:
         self._sydent_host = urlparse(config.sydent_base_url).netloc
 
         self._api.register_third_party_rules_callbacks(
-            on_threepid_bind=self.on_threepid_bind,
+            on_add_user_third_party_identifier=self.on_add_user_third_party_identifier,
         )
 
     @staticmethod
@@ -59,16 +59,20 @@ class SydentBinder:
 
         return SydentBinderConfig(**config)
 
-    async def on_threepid_bind(self, user_id: str, medium: str, address: str) -> None:
-        """Binds the 3PID to Sydent once it's been associated locally."""
-        # Get the list of 3PIDs for this user.
+    async def on_add_user_third_party_identifier(
+        self, user_id: str, medium: str, address: str
+    ) -> None:
+        """
+        Binds a 3PID on the configured Sydent instance when it is locally associated with a user's account.
+        """
+        # Build the body of the internal bind API request.
         body = {
             "medium": medium,
             "address": address,
             "mxid": user_id,
         }
 
-        # Bind the threepid
+        # Bind the third-party ID against the configured Sydent using the internal bind API
         try:
             await self._http_client.post_json_get_json(self._sydent_bind_url, body)
         except Exception as e:

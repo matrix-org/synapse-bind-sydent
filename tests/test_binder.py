@@ -34,7 +34,7 @@ class SydentBinderTestCase(aiounittest.AsyncTestCase):
 
         module = create_module(http_mock=http_client)
 
-        await module.on_threepid_bind(user_id, medium, address)
+        await module.on_add_user_third_party_identifier(user_id, medium, address)
 
         self.assertEqual(http_client.post_json_get_json.call_count, 1)
         args = http_client.post_json_get_json.call_args[0]
@@ -59,7 +59,9 @@ class SydentBinderTestCase(aiounittest.AsyncTestCase):
 
         module = create_module(http_mock=http_client)
 
-        await module.on_threepid_bind("@jdoe:matrix.org", "email", "jdoe@example.com")
+        await module.on_add_user_third_party_identifier(
+            "@jdoe:matrix.org", "email", "jdoe@example.com"
+        )
 
         self.assertEqual(http_client.post_json_get_json.call_count, 1)
 
