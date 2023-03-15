@@ -34,18 +34,33 @@ class SydentBinderTestCase(aiounittest.AsyncTestCase):
 
         module = create_module(http_mock=http_client)
 
-        await module.on_threepid_bind(user_id, medium, address)
+        await module.on_add_user_third_party_identifier(user_id, medium, address)
 
         self.assertEqual(http_client.post_json_get_json.call_count, 1)
-        args = http_client.post_json_get_json.call_args[0]
-        self.assertEqual(
-            args[1], {"address": address, "medium": medium, "mxid": user_id}
-        )
+        (path, body) = http_client.post_json_get_json.call_args[0]
+        self.assertTrue(path.endswith("/_matrix/identity/internal/bind"))
+        self.assertEqual(body, {"address": address, "medium": medium, "mxid": user_id})
 
-        store_remote_3pid_association: Mock = module._api.store_remote_3pid_association  # type: ignore[assignment]
-        self.assertEqual(store_remote_3pid_association.call_count, 1)
-        args = store_remote_3pid_association.call_args[0]
-        self.assertEqual(args, (user_id, medium, address, "test"))
+    async def test_remove_assoc(self) -> None:
+        """Tests that the right function calls are made when the newly registered user has
+        a single 3PID associated.
+        """
+        http_client = Mock()
+        http_client.post_json_get_json = Mock(return_value=make_awaitable(None))
+
+        address = "jdoe@example.com"
+        medium = "email"
+        user_id = "@jdoe:example.com"
+
+        module = create_module(http_mock=http_client)
+
+        await module.on_remove_user_third_party_identifier(user_id, medium, address)
+
+        self.assertEqual(http_client.post_json_get_json.call_count, 1)
+
+        (path, body) = http_client.post_json_get_json.call_args[0]
+        self.assertTrue(path.endswith("/_matrix/identity/internal/unbind"))
+        self.assertEqual(body, {"address": address, "medium": medium, "mxid": user_id})
 
     async def test_network_error(self) -> None:
         """Tests that the process is aborted right away if an error was raised when trying
@@ -59,7 +74,9 @@ class SydentBinderTestCase(aiounittest.AsyncTestCase):
 
         module = create_module(http_mock=http_client)
 
-        await module.on_threepid_bind("@jdoe:matrix.org", "email", "jdoe@example.com")
+        await module.on_add_user_third_party_identifier(
+            "@jdoe:matrix.org", "email", "jdoe@example.com"
+        )
 
         self.assertEqual(http_client.post_json_get_json.call_count, 1)
 

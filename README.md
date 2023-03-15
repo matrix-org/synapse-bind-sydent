@@ -3,7 +3,7 @@
 A module that leverages Sydent's internal bind APIs to automatically record 3PIDs
 association on a Sydent instance once it's been verified on the local Synapse homeserver.
 
-This module works with Synapse v1.78.0 and above.
+This module works with Synapse v1.79.0 and above.
 
 ## Installation
 
