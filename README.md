@@ -79,3 +79,5 @@ Synapse developers (assuming a Unix-like shell):
     ```shell
     git push origin tag v$version
     ```
+
+ 7. [Create a *GitHub release*](https://github.com/matrix-org/synapse-bind-sydent/releases/new), based on the tag you just pushed. 
